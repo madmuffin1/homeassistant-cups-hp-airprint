@@ -21,7 +21,8 @@ RUN \
         ghostscript \
         libjpeg-turbo \
         net-snmp \
-        epson-inkjet-printer-escpr
+        hplip \
+        avahi
 
 # Copy data
 COPY rootfs /

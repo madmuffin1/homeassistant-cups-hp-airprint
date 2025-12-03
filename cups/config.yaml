@@ -1,9 +1,9 @@
 ---
 version: 1.0.0
-slug: cups
-name: CUPS Print Server
-description: CUPS print server for network printing
-url: https://github.com/arest/cups-addon
+slug: hp-airpint
+name: HP Airprint Server
+description: Convert your
+url: https://github.com/madmuffin1/homeassistant-cups-hp-airprint
 codenotary: andrea_restello@yahoo.it
 arch:
   - armhf
@@ -28,3 +28,4 @@ schema:
   admin_username: str
   admin_password: password
 startup: services
+usb: true

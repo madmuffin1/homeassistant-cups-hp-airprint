@@ -25,7 +25,7 @@ This Home Assistant add-on provides a CUPS (Common Unix Printing System) print s
 1. Navigate to your Home Assistant instance.
 2. Go to **Settings** → **Add-ons** → **Add-on Store**.
 3. Click the 3-dot menu in the top right corner and select **Repositories**.
-4. Add `https://github.com/arest/cups-addon` as a repository.
+4. Add `https://github.com/madmuffin1/homeassistant-cups-hp-airprint` as a repository.
 5. Find the "CUPS Print Server" add-on in the store and click it.
 6. Click **Install**.
 
@@ -35,12 +35,12 @@ If you prefer to manually install:
 
 1. Clone this repository to your local machine:
    ```bash
-   git clone https://github.com/arest/cups-addon.git
+   git clone https://github.com/madmuffin1/homeassistant-cups-hp-airprint.git
    ```
 
 2. Copy the repository to your Home Assistant add-ons directory:
    ```bash
-   scp -r cups-addon/cups root@<your-ha-ip>:/addons/
+   scp -r homeassistant-cups-hp-airprint/cups root@<your-ha-ip>:/addons/
    ```
 
 3. In Home Assistant, go to **Settings** → **Add-ons** → **Add-on Store**.
@@ -87,7 +87,7 @@ Configure your computers or devices to use the printer at `<your-ha-ip>:631`.
 
 This add-on supports various printer types:
 
-- Network printers (via IPP, LPD, etc.)
+- Network printers (via IPP, LPD, etc.), especially the ones that use HPLIP
 - USB printers connected to your Home Assistant host
 - Shared Windows printers (via Samba)
 - AirPrint for Apple devices
