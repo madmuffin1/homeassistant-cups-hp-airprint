@@ -132,7 +132,7 @@ This project is licensed under the MIT License.
 
 ## Credits
 
-- Built by [Andrea Restello](https://github.com/arest)
+- Originally built by [Andrea Restello](https://github.com/arest), with enhancements from Igor Malin (https://github.com/ivmreg/cups-addon) and Ra3mbl (https://github.com/Ra3mbl/cups-addon)
 - Powered by [Home Assistant](https://www.home-assistant.io/) and [CUPS](https://www.cups.org/)
 
 ## Data Persistence

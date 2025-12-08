@@ -17,19 +17,25 @@ RUN \
     echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
     apk update && \
     apk add --no-cache \
+        avahi \
+        avahi-compat-libdns_sd \
         cups \
         cups-filters \
+        dbus \
         ghostscript \
-        libjpeg-turbo \
-        net-snmp \
         hplip \
-        avahi
+        libjpeg-turbo \
+        net-snmp
 
 # Copy data
 COPY rootfs /
 
+# Fix permissions for s6-overlay scripts
+RUN chmod -R 755 /etc/services.d && \
+    chmod -R 755 /etc/cont-init.d
+
 # Expose CUPS web interface port
 EXPOSE 631
 
-HEALTHCHECK \
-    CMD lpstat -r || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
+  CMD /usr/bin/lpstat -r || exit 1

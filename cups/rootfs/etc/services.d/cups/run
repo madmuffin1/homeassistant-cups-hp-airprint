@@ -1,0 +1,16 @@
+#!/command/with-contenv bashio
+# rootfs/etc/services.d/cups/run
+# Start CUPS daemon after dependencies are ready
+
+set -e
+
+bashio::log.info "Starting CUPS daemon..."
+
+# Double-check persistent config symlink (safety if cont-init missed it)
+if [ ! -L /etc/cups ] && [ -d /data/cups/config ]; then
+    rm -rf /etc/cups || true
+    ln -s /data/cups/config /etc/cups || true
+fi
+
+# Start CUPS in foreground
+exec /usr/sbin/cupsd -f 2>&1

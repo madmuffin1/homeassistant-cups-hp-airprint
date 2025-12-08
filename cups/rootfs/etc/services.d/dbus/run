@@ -1,0 +1,13 @@
+#!/command/with-contenv bashio
+# rootfs/etc/services.d/dbus/run
+# Run DBus in foreground so s6 supervises it.
+
+set -e
+
+bashio::log.info "Starting DBus system bus..."
+
+# Wait for DBus socket directory
+mkdir -p /var/run/dbus
+
+# Start DBus system bus in foreground (no forking)
+exec dbus-daemon --system --nofork 2>&1

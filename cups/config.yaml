@@ -1,10 +1,10 @@
 ---
-version: 1.9-beta
+version: 1.9-beta1
 slug: hp-airpint
 name: HP Airprint Server
 description: Enhance your old HP Printer to support AirPrint
 url: https://github.com/madmuffin1/homeassistant-cups-hp-airprint
-codenotary: andrea_restello@yahoo.it
+codenotary: patrick.brueckner87@gmail.com
 arch:
   - armhf
   - armv7
@@ -29,3 +29,5 @@ schema:
   admin_password: password
 startup: services
 usb: true
+dbus: true
+apparmor: true
