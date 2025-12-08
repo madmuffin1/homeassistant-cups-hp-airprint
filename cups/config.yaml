@@ -1,5 +1,5 @@
 ---
-version: 1.9-beta1
+version: 1.9-beta2
 slug: hp-airpint
 name: HP Airprint Server
 description: Enhance your old HP Printer to support AirPrint
@@ -31,3 +31,5 @@ startup: services
 usb: true
 dbus: true
 apparmor: true
+ingress: true
+ingress_port: 631
