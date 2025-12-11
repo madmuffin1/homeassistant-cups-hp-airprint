@@ -1,6 +1,6 @@
 ---
 version: 1.9-beta3
-slug: hp-airpint
+slug: hp-airprint
 name: HP Airprint Server
 description: Enhance your old HP Printer to support AirPrint
 url: https://github.com/madmuffin1/homeassistant-cups-hp-airprint
