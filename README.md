@@ -1,13 +1,14 @@
-# Home Assistant CUPS Print Server Add-on
+# HomeAssistant HP Airprint Server
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/arest/cups-addon)
+[![Version](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fgithub.com%2Fmadmuffin1%2Fhomeassistant-cups-hp-airprint%2Fraw%2Frefs%2Fheads%2Fmain%2Fcups%2Fconfig.yaml&query=%24.version&label=version
+)](https://github.com/madmuffin1/homeassistant-cups-hp-airprint)
 [![Supports aarch64 Architecture](https://img.shields.io/badge/aarch64-yes-green.svg)](https://github.com/arest/cups-addon)
 [![Supports amd64 Architecture](https://img.shields.io/badge/amd64-yes-green.svg)](https://github.com/arest/cups-addon)
 [![Supports armhf Architecture](https://img.shields.io/badge/armhf-yes-green.svg)](https://github.com/arest/cups-addon)
 [![Supports armv7 Architecture](https://img.shields.io/badge/armv7-yes-green.svg)](https://github.com/arest/cups-addon)
 [![Supports i386 Architecture](https://img.shields.io/badge/i386-yes-green.svg)](https://github.com/arest/cups-addon)
 
-This Home Assistant add-on provides a CUPS (Common Unix Printing System) print server, allowing you to manage and share printers over your local network. It's designed for Home Assistant users who want to integrate network printing capabilities directly into their smart home setup.
+Add AirPrint functionality to your oldish HP printer. Comes with hplip drivers for best compatibility.
 
 ## Features
 
