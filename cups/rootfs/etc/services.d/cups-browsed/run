@@ -1,0 +1,9 @@
+#!/command/with-contenv bashio
+# rootfs/etc/services.d/cups/run
+# Start CUPS daemon after dependencies are ready
+
+set -e
+
+bashio::log.info "Starting CUPS-browsed daemon..."
+
+exec /usr/sbin/cups-browsed -v 2>&1
