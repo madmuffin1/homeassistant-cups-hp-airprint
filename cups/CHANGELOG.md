@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9-beta9
+
+- Neutralise the CUPS frame-buster in the ingress proxy. Beyond the framing
+  headers, every CUPS page hides itself with `html{display:none;}` and runs
+  `top.location = self.location` when it detects a frame, which navigated the
+  whole browser window out of the ingress iframe instead of rendering in it.
+
 ## 1.9-beta8
 
 - Fix the blank ingress panel. The CUPS web interface now runs behind a small
