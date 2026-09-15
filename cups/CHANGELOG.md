@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.9-beta6
+
+- Revert `publish-addresses=no` from 1.9-beta5. Supervisor's `hassio_multicast`
+  turned out to be `mdns-repeater`, a packet repeater rather than a responder,
+  so there was never a competing publisher to defer to. Suppressing our address
+  records only made the printer's SRV target depend on some other process
+  publishing `homeassistant.local`. The "another mDNS stack" warning comes from
+  the repeater holding port 5353 and cannot be avoided while it runs.
+- Drop the `dbus: true` key from the add-on config. Supervisor's option is
+  `host_dbus`; `dbus` was never recognised and had no effect. The add-on runs
+  its own D-Bus for Avahi, and mapping the host bus would collide with it.
+
 ## 1.9-beta5
 
 - Stop advertising SSH and SFTP over mDNS. The avahi package ships service
