@@ -130,8 +130,9 @@ fi
 # CUPS authenticates admin operations against system accounts in SystemGroup,
 # so the configured account has to exist as a real user inside the container.
 # bashio::config yields the literal string "null" for an unset option.
-ADMIN_USER="$(bashio::config 'admin_username')"
-ADMIN_PASS="$(bashio::config 'admin_password')"
+# Never let a config read abort cont-init; s6 would then fail the whole add-on.
+ADMIN_USER="$(bashio::config 'admin_username' 2>/dev/null || echo '')"
+ADMIN_PASS="$(bashio::config 'admin_password' 2>/dev/null || echo '')"
 if [ "${ADMIN_USER}" = "null" ]; then ADMIN_USER=""; fi
 if [ "${ADMIN_PASS}" = "null" ]; then ADMIN_PASS=""; fi
 

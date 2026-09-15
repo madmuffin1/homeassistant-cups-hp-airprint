@@ -24,6 +24,9 @@
 - Add the missing `build.yaml`. Current Supervisor releases no longer supply an
   implicit `BUILD_FROM`, so the build failed with "base name ($BUILD_FROM)
   should not be blank".
+- Add `edge/main` to the apk repositories. `hplip` is only in `edge/community`
+  and now requires `python3~3.14`, which Alpine 3.23 does not carry, so the
+  build failed with "python3-3.12.14-r0: breaks: hplip-3.26.4-r0[python3~3.14]".
 
 ## 1.9-beta3
 
