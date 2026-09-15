@@ -21,6 +21,9 @@
   reach.
 - Actually apply `admin_username` / `admin_password`. They were declared in the
   schema but never read, so no CUPS admin account existed.
+- Add the missing `build.yaml`. Current Supervisor releases no longer supply an
+  implicit `BUILD_FROM`, so the build failed with "base name ($BUILD_FROM)
+  should not be blank".
 
 ## 1.9-beta3
 

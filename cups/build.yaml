@@ -1,0 +1,12 @@
+---
+# Supervisor substitutes these into the Dockerfile's BUILD_FROM arg. Without
+# this file the build fails with "base name ($BUILD_FROM) should not be blank";
+# older Supervisor releases still supplied an implicit default, newer ones do
+# not. aarch64/amd64 track Alpine 3.23, which is what the last working image
+# was built from. The 32-bit bases stop at 3.22 upstream.
+build_from:
+  aarch64: ghcr.io/home-assistant/aarch64-base:3.23
+  amd64: ghcr.io/home-assistant/amd64-base:3.23
+  armhf: ghcr.io/home-assistant/armhf-base:3.22
+  armv7: ghcr.io/home-assistant/armv7-base:3.22
+  i386: ghcr.io/home-assistant/i386-base:3.22
