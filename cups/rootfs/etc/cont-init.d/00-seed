@@ -23,7 +23,8 @@ mkdir -p "${PPD_DIR}" \
          "${CONFIG_PATH}/cache" \
          "${CONFIG_PATH}/logs" \
          "${CONFIG_PATH}/state" \
-         "${CONFIG_CONF}/certs"
+         "${CONFIG_CONF}/certs" \
+         "${CONFIG_CONF}/ssl"
 
 # Set ownership & conservative perms (idempotent)
 chown -R root:lp "${CONFIG_PATH}" || true
@@ -33,6 +34,8 @@ find "${CONFIG_PATH}" -type d -exec chmod 0750 {} \; || true
 find "${CONFIG_PATH}" -type f -exec chmod 0640 {} \; || true
 # PPDs should be readable by clients; relax later if needed
 chmod 0755 "${PPD_DIR}" || true
+# cupsd stores its self-signed TLS cert here; it refuses to create the dir itself
+chmod 0700 "${CONFIG_CONF}/ssl" || true
 
 # Seed cupsd.conf only if absent/empty
 if [ ! -s "${CUPSD_CONF}" ]; then
@@ -54,20 +57,27 @@ MaxJobs 500
 
 <Location />
   Order allow,deny
-  Allow 127.0.0.1
-  Allow ::1
-  Allow 192.168.1.0/24
+  Allow @LOCAL
 </Location>
 
 <Location /admin>
   Order allow,deny
-  Allow 127.0.0.1
-  Allow ::1
-  Allow 192.168.1.0/24
+  Allow @LOCAL
 </Location>
 CUPSD
   chown root:lp "${CUPSD_CONF}" || true
   chmod 0640 "${CUPSD_CONF}" || true
+fi
+
+# Repair the legacy seeded ACL on existing installs.
+# Earlier versions seeded a hardcoded "Allow 192.168.1.0/24", which denies every
+# client on any other subnet, and covers no IPv6 address beyond loopback. Apple
+# clients resolve <host>.local to IPv6 first, so they were refused with 403 at
+# the moment the printer was added. Only the untouched default is rewritten, so
+# a deliberately narrowed ACL is left alone.
+if grep -q '^[[:space:]]*Allow 192\.168\.1\.0/24[[:space:]]*$' "${CUPSD_CONF}" 2>/dev/null; then
+  bashio::log.warning "Replacing legacy hardcoded ACL with @LOCAL (covers IPv4 and IPv6)..."
+  sed -i 's|^[[:space:]]*Allow 192\.168\.1\.0/24[[:space:]]*$|  Allow @LOCAL|' "${CUPSD_CONF}"
 fi
 
 # Ensure printers.conf exists
@@ -94,6 +104,64 @@ else
   fi
   ln -s "${CONFIG_CONF}" /etc/cups
   bashio::log.info "Linked /etc/cups -> ${CONFIG_CONF}"
+fi
+
+# ---------------------------------------------------------------------------
+# Bind Avahi to the LAN interface only.
+# The add-on runs with host_network, so the container also sees HA's docker
+# bridges (hassio, docker0) and every veth pair. Left unrestricted, Avahi
+# publishes those addresses too, and a client that picks a 172.30.x.x record
+# cannot reach the printer. The LAN interface is detected rather than hardcoded
+# because it differs per platform (end0 on RPi, eth0/enp* elsewhere).
+LAN_IF="$(ip route show default 2>/dev/null | awk '/^default/ {print $5; exit}')"
+if [ -n "${LAN_IF}" ]; then
+  bashio::log.info "Restricting Avahi to LAN interface ${LAN_IF}..."
+  if grep -q '^allow-interfaces=' /etc/avahi/avahi-daemon.conf; then
+    sed -i "s|^allow-interfaces=.*|allow-interfaces=${LAN_IF}|" /etc/avahi/avahi-daemon.conf
+  else
+    sed -i "s|^\[server\]|[server]\nallow-interfaces=${LAN_IF}|" /etc/avahi/avahi-daemon.conf
+  fi
+else
+  bashio::log.warning "Could not detect LAN interface; Avahi will bind all interfaces."
+fi
+
+# ---------------------------------------------------------------------------
+# Wire up the admin_username / admin_password options.
+# CUPS authenticates admin operations against system accounts in SystemGroup,
+# so the configured account has to exist as a real user inside the container.
+# bashio::config yields the literal string "null" for an unset option.
+ADMIN_USER="$(bashio::config 'admin_username')"
+ADMIN_PASS="$(bashio::config 'admin_password')"
+if [ "${ADMIN_USER}" = "null" ]; then ADMIN_USER=""; fi
+if [ "${ADMIN_PASS}" = "null" ]; then ADMIN_PASS=""; fi
+
+if [ -n "${ADMIN_USER}" ] && [ -n "${ADMIN_PASS}" ]; then
+  if ! getent group lpadmin > /dev/null 2>&1; then
+    addgroup -S lpadmin || true
+  fi
+  if ! id "${ADMIN_USER}" > /dev/null 2>&1; then
+    bashio::log.info "Creating CUPS admin user '${ADMIN_USER}'..."
+    adduser -D -H -G lpadmin -s /sbin/nologin "${ADMIN_USER}" || true
+  fi
+  addgroup "${ADMIN_USER}" lpadmin 2> /dev/null || true
+  # Re-applied on every start so a changed password in the add-on options takes effect.
+  echo "${ADMIN_USER}:${ADMIN_PASS}" | chpasswd > /dev/null 2>&1 || \
+    bashio::log.warning "Could not set password for '${ADMIN_USER}'."
+
+  # CUPS's built-in default policy already requires @SYSTEM for admin operations,
+  # but only once an auth type other than None is in effect.
+  if grep -q '^DefaultAuthType' "${CUPSD_CONF}"; then
+    sed -i 's|^DefaultAuthType.*|DefaultAuthType Basic|' "${CUPSD_CONF}"
+  else
+    echo "DefaultAuthType Basic" >> "${CUPSD_CONF}"
+  fi
+  if grep -q '^SystemGroup' "${CUPSD_CONF}"; then
+    sed -i 's|^SystemGroup.*|SystemGroup lpadmin|' "${CUPSD_CONF}"
+  else
+    echo "SystemGroup lpadmin" >> "${CUPSD_CONF}"
+  fi
+else
+  bashio::log.warning "admin_username/admin_password not set; leaving CUPS admin unauthenticated."
 fi
 
 bashio::log.info "cont-init: CUPS persistent init complete."
