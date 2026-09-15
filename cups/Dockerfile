@@ -26,7 +26,8 @@ RUN \
         ghostscript \
         hplip \
         libjpeg-turbo \
-        net-snmp
+        net-snmp \
+        nginx
 
 # The avahi package ships service files that advertise SSH and SFTP for the
 # host. A print server has no business publishing those, and under

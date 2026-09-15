@@ -1,0 +1,18 @@
+#!/command/with-contenv bashio
+# rootfs/etc/services.d/nginx/run
+# Reverse proxy that serves the CUPS web interface through HA ingress
+
+set -e
+
+bashio::log.info "Starting ingress proxy (nginx)..."
+
+# s6 starts cups first but does not wait for readiness; nginx would still come
+# up, but proxying before cupsd listens produces 502s in the panel.
+for _ in $(seq 1 60); do
+    if nc -z 127.0.0.1 631 2> /dev/null; then
+        break
+    fi
+    sleep 0.5
+done
+
+exec nginx -c /etc/nginx/nginx.conf

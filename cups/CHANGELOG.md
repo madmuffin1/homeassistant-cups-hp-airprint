@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.9-beta7
+
+- Fix the blank ingress panel. The CUPS web interface now runs behind a small
+  nginx reverse proxy on the ingress port. CUPS sends `X-Frame-Options: DENY`
+  and `Content-Security-Policy: frame-ancestors 'none'`, and ingress renders
+  add-on UIs in an iframe, so the browser refused to display anything. CUPS has
+  no setting for those headers, so the proxy strips them. The proxy also
+  rewrites the absolute links CUPS emits (`/cups.css`, `/admin`, ...) onto the
+  ingress path prefix, which would otherwise 404.
+- The panel is served on port 8099, restricted to the Supervisor. Port 631 is
+  unchanged for direct access on the LAN.
+
 ## 1.9-beta6
 
 - Revert `publish-addresses=no` from 1.9-beta5. Supervisor's `hassio_multicast`
