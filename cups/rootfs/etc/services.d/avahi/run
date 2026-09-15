@@ -9,5 +9,19 @@ bashio::log.info "Starting Avahi daemon..."
 # Ensure Avahi runtime dir exists
 mkdir -p /var/run/avahi-daemon
 
+# s6 starts the dependency but does not wait for it to be ready, so on a cold
+# start avahi-daemon would find no bus, exit 255 and only survive the restart.
+# Wait for the socket instead of relying on that retry.
+for _ in $(seq 1 60); do
+    if [ -S /run/dbus/system_bus_socket ]; then
+        break
+    fi
+    sleep 0.5
+done
+
+if [ ! -S /run/dbus/system_bus_socket ]; then
+    bashio::log.warning "D-Bus socket did not appear; starting Avahi anyway."
+fi
+
 # Start Avahi in foreground (Alpine build supports --debug, not --no-daemon)
 exec avahi-daemon --no-drop-root --no-chroot

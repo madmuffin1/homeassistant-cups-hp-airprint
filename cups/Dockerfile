@@ -28,6 +28,11 @@ RUN \
         libjpeg-turbo \
         net-snmp
 
+# The avahi package ships service files that advertise SSH and SFTP for the
+# host. A print server has no business publishing those, and under
+# host_network they appear on the LAN as records for "homeassistant".
+RUN rm -f /etc/avahi/services/*.service
+
 # Copy data
 COPY rootfs /
 

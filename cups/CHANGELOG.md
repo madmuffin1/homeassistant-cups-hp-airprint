@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.9-beta5
+
+- Stop advertising SSH and SFTP over mDNS. The avahi package ships service
+  files for them, so under `host_network` this print server was publishing
+  `_ssh._tcp` and `_sftp-ssh._tcp` records for the host.
+- Wait for the D-Bus socket before starting Avahi. s6 starts the dependency but
+  does not wait for readiness, so on a cold start avahi-daemon found no bus,
+  exited 255, and only came up on the supervisor's restart.
+- Set `publish-addresses=no`. Supervisor's `hassio_multicast` plugin runs its
+  own Avahi on this host and already publishes the host's address records;
+  republishing them is what triggered avahi's "Detected another mDNS stack"
+  warning. Only the printer service is advertised now, and the SRV target still
+  resolves through the Supervisor's responder.
+
 ## 1.9-beta4
 
 - Fix AirPrint failing on iOS when adding the printer. Two independent causes:
