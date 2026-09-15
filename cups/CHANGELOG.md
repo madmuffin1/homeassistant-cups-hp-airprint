@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.9-beta7
+## 1.9-beta8
 
 - Fix the blank ingress panel. The CUPS web interface now runs behind a small
   nginx reverse proxy on the ingress port. CUPS sends `X-Frame-Options: DENY`
@@ -9,8 +9,10 @@
   no setting for those headers, so the proxy strips them. The proxy also
   rewrites the absolute links CUPS emits (`/cups.css`, `/admin`, ...) onto the
   ingress path prefix, which would otherwise 404.
-- The panel is served on port 8099, restricted to the Supervisor. Port 631 is
-  unchanged for direct access on the LAN.
+- The panel is served on port 8099, restricted to `172.30.0.0/16` so only
+  Supervisor-managed networks reach it. Ingress arrives from the Supervisor's
+  own network, not the hassio bridge, so a narrower rule rejects it. Port 631
+  is unchanged for direct access on the LAN.
 
 ## 1.9-beta6
 
